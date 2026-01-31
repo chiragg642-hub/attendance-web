@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Attendance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: gray;
+    }
+
+    #msg {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Mark Attendance</h2>
+
+    <input id="roll" type="text" placeholder="Roll Number" required />
+    <input id="name" type="text" placeholder="Full Name" required />
+    <input id="subject" type="text" placeholder="Subject" required />
+
+    <button onclick="submitAttendance()">Submit</button>
+
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    // 🔗 PASTE YOUR APPS SCRIPT WEB APP URL HERE
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhDaK9oPRK94nbrupG1vku2uaW2_mc_PrU-guQxu3MxiL-B947l3h3CUwaMpSej-EFPA/exec";
+
+    // 📌 Read session ID from URL (?session=...)
+    const params = new URLSearchParams(window.location.search);
+    const SESSION_ID = params.get("session");
+
+    if (!SESSION_ID) {
+      document.getElementById("msg").innerText =
+        "Invalid session link ❌";
+      document.querySelector("button").disabled = true;
+    }
+
+    function submitAttendance() {
+      const roll = document.getElementById("roll").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const msg = document.getElementById("msg");
+
+      if (!roll || !name || !subject) {
+        msg.innerText = "Please fill all fields ⚠️";
+        return;
+      }
+
+      msg.innerText = "Submitting...";
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          session_id: SESSION_ID,
+          roll: roll,
+          name: name,
+          subject: subject
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          msg.innerText = "Attendance marked ✅";
+        } 
+        else if (data.status === "duplicate") {
+          msg.innerText = "Attendance already marked ⚠️";
+        } 
+        else if (data.status === "expired") {
+          msg.innerText = "Attendance window closed ⏱️";
+        } 
+        else {
+          msg.innerText = "Error ❌";
+        }
+      })
+      .catch(err => {
+        msg.innerText = "Network error ❌";
+      });
+    }
+  </script>
+
+</body>
+</html>
