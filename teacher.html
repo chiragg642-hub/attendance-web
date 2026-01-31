@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Attendance Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #007bff;
+    }
+
+    #sessionBox {
+      margin-top: 20px;
+      display: none;
+    }
+
+    #link {
+      word-break: break-all;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    img {
+      margin-top: 15px;
+      width: 200px;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Teacher Attendance Panel</h2>
+
+  <input id="subject" type="text" placeholder="Subject Name (e.g. DBMS)" />
+
+  <button onclick="startAttendance()">Start Attendance</button>
+
+  <div id="sessionBox">
+    <p><strong>Session Link</strong></p>
+    <div id="link"></div>
+
+    <button class="secondary" onclick="copyLink()">Copy Link</button>
+
+    <img id="qr" alt="QR Code" />
+  </div>
+</div>
+
+<script>
+  const STUDENT_PAGE_URL =
+    "https://chiragg642-hub.github.io/attendance-web/";
+
+  function startAttendance() {
+    const subject = document.getElementById("subject").value.trim();
+    if (!subject) {
+      alert("Please enter subject name");
+      return;
+    }
+
+    const now = new Date();
+
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0"); // 24-hour
+    const min = String(now.getMinutes()).padStart(2, "0");
+
+    const sessionId = `${subject}_${yyyy}-${mm}-${dd}_${hh}:${min}`;
+
+    const studentLink = `${STUDENT_PAGE_URL}?session=${encodeURIComponent(sessionId)}`;
+
+    document.getElementById("link").innerText = studentLink;
+
+    document.getElementById("qr").src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+      encodeURIComponent(studentLink);
+
+    document.getElementById("sessionBox").style.display = "block";
+  }
+
+  function copyLink() {
+    const text = document.getElementById("link").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Link copied!");
+  }
+</script>
+
+</body>
+</html>
