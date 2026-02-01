@@ -96,7 +96,10 @@
 
       fetch(WEB_APP_URL, {
         method: "POST",
-        body: new URLSearchParams({
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
           session_id: SESSION_ID,
           roll: roll,
           name: name
