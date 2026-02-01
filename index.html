@@ -105,22 +105,10 @@
 
       .then(res => res.json())
       .then(data => {
-        if (data.status === "success") {
-          msg.innerText = "Attendance marked ✅";
-        } 
-        else if (data.status === "duplicate") {
-          msg.innerText = "Attendance already marked ⚠️";
-        } 
-        else if (data.status === "expired") {
-          msg.innerText = "Attendance window closed ⏱️";
-        } 
-        else {
-          msg.innerText = "Error ❌";
-        }
+        console.log("Server response:", data);
+        msg.innerText = JSON.stringify(data);
       })
-      .catch(err => {
-        msg.innerText = "Network error ❌";
-      });
+
     }
   </script>
 
