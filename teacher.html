@@ -20,7 +20,7 @@
       padding: 25px;
       border-radius: 10px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-align: center;
     }
@@ -29,11 +29,11 @@
       margin-bottom: 15px;
     }
 
-    input, button {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
-      font-size: 16px;
+      font-size: 15px;
     }
 
     button {
@@ -55,7 +55,7 @@
 
     #link {
       word-break: break-all;
-      font-size: 14px;
+      font-size: 13px;
       margin-top: 10px;
     }
 
@@ -71,12 +71,28 @@
 <div class="card">
   <h2>Teacher Attendance Panel</h2>
 
-  <input id="subject" type="text" placeholder="Subject Name (e.g. DBMS)" />
+  <select id="course">
+    <option value="">Select Course</option>
+    <option value="BTECH">B.Tech</option>
+    <option value="MTECH">M.Tech</option>
+  </select>
+
+  <select id="semester">
+    <option value="">Select Semester</option>
+    <option value="1">1</option><option value="2">2</option>
+    <option value="3">3</option><option value="4">4</option>
+    <option value="5">5</option><option value="6">6</option>
+    <option value="7">7</option><option value="8">8</option>
+  </select>
+
+  <input id="class" type="text" placeholder="Class (e.g. CSE-5A)" />
+  <input id="subject" type="text" placeholder="Subject (e.g. DBMS)" />
+  <input id="teacher" type="text" placeholder="Teacher Name (e.g. SHARMA)" />
 
   <button onclick="startAttendance()">Start Attendance</button>
 
   <div id="sessionBox">
-    <p><strong>Session Link</strong></p>
+    <p><strong>Student Link</strong></p>
     <div id="link"></div>
 
     <button class="secondary" onclick="copyLink()">Copy Link</button>
@@ -89,24 +105,34 @@
   const STUDENT_PAGE_URL =
     "https://chiragg642-hub.github.io/attendance-web/";
 
+  function clean(value) {
+    return value.trim().toUpperCase().replace(/\s+/g, "");
+  }
+
   function startAttendance() {
-    const subject = document.getElementById("subject").value.trim();
-    if (!subject) {
-      alert("Please enter subject name");
+    const course = document.getElementById("course").value;
+    const semester = document.getElementById("semester").value;
+    const cls = clean(document.getElementById("class").value);
+    const subject = clean(document.getElementById("subject").value);
+    const teacher = clean(document.getElementById("teacher").value);
+
+    if (!course || !semester || !cls || !subject || !teacher) {
+      alert("Please fill all fields");
       return;
     }
 
     const now = new Date();
-
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-    const hh = String(now.getHours()).padStart(2, "0"); // 24-hour
+    const hh = String(now.getHours()).padStart(2, "0");
     const min = String(now.getMinutes()).padStart(2, "0");
 
-    const sessionId = `${subject}_${yyyy}-${mm}-${dd}_${hh}:${min}`;
+    const sessionId =
+      `${course}|${semester}|${cls}|${subject}|${teacher}|${yyyy}-${mm}-${dd}|${hh}:${min}`;
 
-    const studentLink = `${STUDENT_PAGE_URL}?session=${encodeURIComponent(sessionId)}`;
+    const studentLink =
+      `${STUDENT_PAGE_URL}?session=${encodeURIComponent(sessionId)}`;
 
     document.getElementById("link").innerText = studentLink;
 
