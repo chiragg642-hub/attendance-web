@@ -96,7 +96,10 @@
 
       fetch(WEB_APP_URL, {
         method: "POST",
-        body: new URLSearchParams({
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
           session_id: SESSION_ID,
           roll: roll,
           name: name
@@ -105,9 +108,23 @@
 
       .then(res => res.json())
       .then(data => {
-        console.log("Server response:", data);
-        msg.innerText = JSON.stringify(data);
+        if (data.status === "success") {
+          msg.innerText = "Attendance marked ✅";
+        } 
+        else if (data.status === "duplicate") {
+          msg.innerText = "Attendance already marked ⚠️";
+        } 
+        else if (data.status === "expired") {
+          msg.innerText = "Attendance window closed ⏱️";
+        } 
+        else {
+          msg.innerText = "Error ❌";
+        }
       })
+      .catch(err => {
+        console.error(err);
+        msg.innerText = "Error ❌";
+      });
 
     }
   </script>
