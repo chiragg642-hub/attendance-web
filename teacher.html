@@ -28,11 +28,43 @@
   </div>
   <input id="teacher" class="form-control mt-2" placeholder="Teacher Name">
   <button class="btn btn-success mt-2" onclick="generateSession()">Generate QR</button>
-  <div id="qrcode"></div>
+  <div id="qrcode" style="width:180px; height:180px;"></div>
   <div id="sessionLink" class="mt-2"></div>
 </div>
 
 <script>
+function generateSession(){
+  const course = document.getElementById("course").value.trim();
+  const semester = document.getElementById("semester").value.trim();
+  const cls = document.getElementById("cls").value.trim();
+  const subject = document.getElementById("subject").value.trim();
+  const teacher = document.getElementById("teacher").value.trim();
+
+  if(!course || !semester || !cls || !subject || !teacher){
+    alert("Fill all fields!");
+    return;
+  }
+
+  const timestamp = new Date().toISOString();
+  const sessionId = `${course}|${semester}|${cls}|${subject}|${teacher}|${timestamp}`;
+  const url = `${window.location.origin}/index.html?session=${encodeURIComponent(sessionId)}`;
+
+  document.getElementById("sessionLink").innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+
+  // Clear previous QR code
+  document.getElementById("qrcode").innerHTML = "";
+
+  // Generate new QR code
+  new QRCode(document.getElementById("qrcode"), {
+    text: url,
+    width: 180,
+    height: 180,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+
 function generateSession(){
   const course = document.getElementById("course").value.trim();
   const semester = document.getElementById("semester").value.trim();
