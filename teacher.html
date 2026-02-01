@@ -1,153 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Attendance Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 15px;
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 15px;
-    }
-
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: #007bff;
-    }
-
-    #sessionBox {
-      margin-top: 20px;
-      display: none;
-    }
-
-    #link {
-      word-break: break-all;
-      font-size: 13px;
-      margin-top: 10px;
-    }
-
-    img {
-      margin-top: 15px;
-      width: 200px;
-      height: 200px;
-    }
-  </style>
+  <title>Teacher Attendance</title>
 </head>
 <body>
 
-<div class="card">
-  <h2>Teacher Attendance Panel</h2>
+<h2>Create Attendance Session</h2>
 
-  <select id="course">
-    <option value="">Select Course</option>
-    <option value="BTECH">B.Tech</option>
-    <option value="MTECH">M.Tech</option>
-  </select>
+<input id="course" placeholder="Course (BTECH)" />
+<input id="sem" placeholder="Semester (3)" />
+<input id="cls" placeholder="Class (CS-A)" />
+<input id="subject" placeholder="Subject (MATHS)" />
+<input id="teacher" placeholder="Teacher Name" />
+<input id="date" type="date" />
+<input id="time" type="time" />
 
-  <select id="semester">
-    <option value="">Select Semester</option>
-    <option value="1">1</option><option value="2">2</option>
-    <option value="3">3</option><option value="4">4</option>
-    <option value="5">5</option><option value="6">6</option>
-    <option value="7">7</option><option value="8">8</option>
-  </select>
+<button onclick="generate()">Generate Session</button>
 
-  <input id="class" type="text" placeholder="Class (e.g. CSE-5A)" />
-  <input id="subject" type="text" placeholder="Subject (e.g. DBMS)" />
-  <input id="teacher" type="text" placeholder="Teacher Name (e.g. SHARMA)" />
+<p id="output"></p>
+<img id="qr" />
 
-  <button onclick="startAttendance()">Start Attendance</button>
-
-  <div id="sessionBox">
-    <p><strong>Student Link</strong></p>
-    <div id="link"></div>
-
-    <button class="secondary" onclick="copyLink()">Copy Link</button>
-
-    <img id="qr" alt="QR Code" />
-  </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
 <script>
-  const STUDENT_PAGE_URL =
-    "https://chiragg642-hub.github.io/attendance-web/";
+const STUDENT_PAGE = "https://chiragg642-hub.github.io/attendance-web/";
 
-  function clean(value) {
-    return value.trim().toUpperCase().replace(/\s+/g, "");
+function generate() {
+  const course = courseEl.value.trim();
+  const sem = semEl.value.trim();
+  const cls = clsEl.value.trim();
+  const subject = subjectEl.value.trim();
+  const teacher = teacherEl.value.trim();
+  const date = dateEl.value;
+  const time = timeEl.value;
+
+  if (!course || !sem || !cls || !subject || !teacher || !date || !time) {
+    alert("Fill all fields");
+    return;
   }
 
-  function startAttendance() {
-    const course = document.getElementById("course").value;
-    const semester = document.getElementById("semester").value;
-    const cls = clean(document.getElementById("class").value);
-    const subject = clean(document.getElementById("subject").value);
-    const teacher = clean(document.getElementById("teacher").value);
+  const sessionId =
+    `${course}|${sem}|${cls}|${subject}|${teacher}|${date}|${time}`;
 
-    if (!course || !semester || !cls || !subject || !teacher) {
-      alert("Please fill all fields");
-      return;
-    }
+  const url = `${STUDENT_PAGE}?session=${encodeURIComponent(sessionId)}`;
 
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    const hh = String(now.getHours()).padStart(2, "0");
-    const min = String(now.getMinutes()).padStart(2, "0");
+  document.getElementById("output").innerText = url;
 
-    const sessionId =
-      `${course}|${semester}|${cls}|${subject}|${teacher}|${yyyy}-${mm}-${dd}|${hh}:${min}`;
+  QRCode.toDataURL(url).then(qr => {
+    document.getElementById("qr").src = qr;
+  });
+}
 
-    const studentLink =
-      `${STUDENT_PAGE_URL}?session=${encodeURIComponent(sessionId)}`;
-
-    document.getElementById("link").innerText = studentLink;
-
-    document.getElementById("qr").src =
-      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
-      encodeURIComponent(studentLink);
-
-    document.getElementById("sessionBox").style.display = "block";
-  }
-
-  function copyLink() {
-    const text = document.getElementById("link").innerText;
-    navigator.clipboard.writeText(text);
-    alert("Link copied!");
-  }
+const courseEl = document.getElementById("course");
+const semEl = document.getElementById("sem");
+const clsEl = document.getElementById("cls");
+const subjectEl = document.getElementById("subject");
+const teacherEl = document.getElementById("teacher");
+const dateEl = document.getElementById("date");
+const timeEl = document.getElementById("time");
 </script>
 
 </body>

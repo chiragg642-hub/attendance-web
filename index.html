@@ -1,119 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>College Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .card {
-      background: white;
-      padding: 50px;
-      border-radius: 30px;
-      width: 100%;
-      max-width: 350px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    input, button {
-      width: 90%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background: gray;
-    }
-
-    #msg {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-  </style>
+  <title>Mark Attendance</title>
 </head>
 <body>
 
-  <div class="card">
-    <h2>Mark Attendance</h2>
+<h2>Student Attendance</h2>
 
-    <input id="roll" type="text" placeholder="Roll Number" required />
-    <input id="name" type="text" placeholder="Full Name" required />
-    
-    <button onclick="submitAttendance()">Submit</button>
+<input id="roll" placeholder="Roll Number" />
+<input id="name" placeholder="Full Name" />
 
-    <div id="msg"></div>
-  </div>
+<button onclick="submitAttendance()">Submit</button>
 
-  <script>
-    // 🔗 PASTE YOUR APPS SCRIPT WEB APP URL HERE
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlx06JsnHTFGWO8pD5pisrtNZrSgu_DQk7L4qeZ5lpdUmC4Ev8oBZzSQ6xvbQBqAhZkg/exec";
+<p id="msg"></p>
 
-    // 📌 Read session ID from URL (?session=...)
-    const params = new URLSearchParams(window.location.search);
-    const SESSION_ID = params.get("session");
+<script>
+const WEB_APP_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 
-    if (!SESSION_ID) {
-      document.getElementById("msg").innerText =
-        "Invalid session link ❌";
-      document.querySelector("button").disabled = true;
-    }
+const params = new URLSearchParams(window.location.search);
+const SESSION_ID = params.get("session");
 
-    function submitAttendance() {
-      const roll = document.getElementById("roll").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const msg = document.getElementById("msg");
+if (!SESSION_ID) {
+  document.getElementById("msg").innerText = "Invalid session link";
+}
 
-      if (!roll || !name) {
-        msg.innerText = "Please fill all fields ⚠️";
-        return;
-      }
+function submitAttendance() {
+  const roll = rollEl.value.trim();
+  const name = nameEl.value.trim();
 
-      msg.innerText = "Submitting...";
+  if (!roll || !name) {
+    msg.innerText = "Fill all fields";
+    return;
+  }
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          session_id: SESSION_ID,
-          roll: roll,
-          name: name
-        })
-      })
+  msg.innerText = "Submitting...";
 
-      .then(res => res.json())
-      .then(data => {
-        console.log("Server response:", data);
-        msg.innerText = JSON.stringify(data);
-      })
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      session_id: SESSION_ID,
+      roll: roll,
+      name: name
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") msg.innerText = "Attendance marked ✅";
+    else if (data.status === "duplicate") msg.innerText = "Already marked ⚠️";
+    else if (data.status === "expired") msg.innerText = "Session closed ⏱️";
+    else msg.innerText = data.message || "Error ❌";
+  })
+  .catch(() => msg.innerText = "Network error ❌");
+}
 
-    }
-  </script>
+const rollEl = document.getElementById("roll");
+const nameEl = document.getElementById("name");
+const msg = document.getElementById("msg");
+</script>
 
 </body>
 </html>
