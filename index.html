@@ -62,8 +62,7 @@
 
     <input id="roll" type="text" placeholder="Roll Number" required />
     <input id="name" type="text" placeholder="Full Name" required />
-    <input id="subject" type="text" placeholder="Subject" required />
-
+    
     <button onclick="submitAttendance()">Submit</button>
 
     <div id="msg"></div>
@@ -86,7 +85,6 @@
     function submitAttendance() {
       const roll = document.getElementById("roll").value.trim();
       const name = document.getElementById("name").value.trim();
-      const subject = document.getElementById("subject").value.trim();
       const msg = document.getElementById("msg");
 
       if (!roll || !name || !subject) {
@@ -101,8 +99,7 @@
         body: new URLSearchParams({
           session_id: SESSION_ID,
           roll: roll,
-          name: name,
-          subject: subject
+          name: name
         })
       })
 
